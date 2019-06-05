@@ -9,10 +9,10 @@ var docker = new Docker({socketPath: '/var/run/docker.sock'});
 
 //////////////// PULL DOCKER IMAGE BY NAME ////////////////
 var pull_docker = function(req, res) {
-  console.log('Req: ' + req.params.name);
-  docker.pull(req.params.name, function (err, stream) {
+  var name = req.params.user ? req.params.user+'/'+req.params.repo_name : req.params.repo_name;
+  console.log('Req: ' + name);
+  docker.pull(name, function (err, stream) {
     if (err) {
-      // console.log(JSON.stringify(err));
       res.send(err);
     } else {
       docker.modem.followProgress(stream, onFinished, onProgress);
@@ -30,10 +30,10 @@ var pull_docker = function(req, res) {
 
 //////////////// CREATE CONTAINER FROM SPECIFIED IMAGE NAME ////////////////
 var create_container = function(req, res) {
-  console.log('Req: ' + req.params.image);
+  var img = req.params.user ? req.params.user+'/'+req.params.repo_name : req.params.repo_name;
   
   var opts = {
-    "image": req.params.image
+    "image": img
   };
 
   docker.createContainer(opts, function (err, container) {
@@ -50,11 +50,8 @@ var create_container = function(req, res) {
 var start_container = function(req, res) {
   var id = req.params.id;
   var container = docker.getContainer(id);
-  var opts = {
-    "id": id
-  };
 
-  container.start(opts, function(err, result) {
+  container.start(function(err, result) {
     if (err) {
       res.send(err);
     } else {
@@ -67,11 +64,8 @@ var start_container = function(req, res) {
 var stop_container = function(req, res) {
   var id = req.params.id;
   var container = docker.getContainer(id);
-  var opts = {
-    "id": id
-  };
 
-  container.stop(opts, function(err, result) {
+  container.stop(function(err, result) {
     if (err) {
       res.send(err);
     } else {
@@ -128,6 +122,7 @@ var get_list_of_images = function(req, res) {
     }
   });
 };
+
 
 
 ///////////////////////////////////////////////////////////////////////////
