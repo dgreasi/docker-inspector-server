@@ -1,0 +1,29 @@
+{
+  "name": "docker_inspector_server",
+  "version": "1.0.0",
+  "description": "The server part of a web based tool to interact and monitor docker containers",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Temeteron/docker_inspector_server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Temeteron/docker_inspector_server/issues"
+  },
+  "homepage": "https://github.com/Temeteron/docker_inspector_server#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "dockerode": "^2.5.8",
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  }
+}
