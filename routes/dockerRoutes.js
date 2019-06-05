@@ -3,11 +3,11 @@ module.exports = function(app) {
   var dockerList = require('../controllers/dockerController');
 
   // PULL DOCKER IMAGE BY NAME
-  app.route('/pull_docker/:name')
+  app.route('/pull_docker/:user?/:repo_name')
     .get(dockerList.pull_docker);
 
-  // CREATE CONTAINER FROM SPECIFIED IMAGE NAME
-  app.route('/create_container/:image')
+  // CREATE CONTAINER FROM SPECIFIED IMAGE NAME (enhariharan/infinite-loop)
+  app.route('/create_container/:user?/:repo_name')
     .post(dockerList.create_container);
 
   // START CONTAINER
