@@ -7,17 +7,21 @@ var docker = new Docker({socketPath: '/var/run/docker.sock'});
 /////////////////////////////// FUNCTIONS /////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-//////////////// PULL DOCKER IMAGE BY NAME ////////////////
+///////////////////////////////////////////////////////////////////////////
+// PULL DOCKER IMAGE BY NAME
+///////////////////////////////////////////////////////////////////////////
 var pull_docker = function(req, res) {
+  // GET REPO_NAME FROM BODY
   let repo_name = req.body.repo_name;
-  console.log('Req: ' + repo_name);
 
+  // PULL DOCKER IMAGE
   docker.pull(repo_name, function (err, stream) {
-    if (err) {
+    if (err) { // IF ERROR SEND ERR
       res.send(err);
-    } else {
+    } else { // FOLLOW PROGRESS AND LOG
       docker.modem.followProgress(stream, onFinished, onProgress);
 
+      // ON FINISH RETURN IMAGE
       function onFinished(err, output) {
         res.send(output);
       }
@@ -29,17 +33,21 @@ var pull_docker = function(req, res) {
   });
 };
 
-//////////////// CREATE CONTAINER FROM SPECIFIED IMAGE NAME ////////////////
+///////////////////////////////////////////////////////////////////////////
+// CREATE CONTAINER FROM SPECIFIED IMAGE NAME
+///////////////////////////////////////////////////////////////////////////
 var create_container = function(req, res) {
+  // GET REPO_NAME FROM BODY
   let img = req.body.repo_name;
-  // console.log("body NAME: " + JSON.stringify(req.body));
+
+  // OPTIONS OBJECT
   let opts = {
     "image": img
   };
 
+  // CREATE CONTAINER FROM IMAGE NAME
   docker.createContainer(opts, function (err, container) {
     if (err) {
-      // console.log(JSON.stringify(err));
       res.send(err);
     } else {
       res.json(container);
@@ -47,11 +55,16 @@ var create_container = function(req, res) {
   });
 };
 
-//////////////// START CONTAINER ////////////////
+///////////////////////////////////////////////////////////////////////////
+// START CONTAINER
+///////////////////////////////////////////////////////////////////////////
 var start_container = function(req, res) {
-  var id = req.params.id;
-  var container = docker.getContainer(id);
+  // GET ID FROM PARAMS
+  let id = req.params.id;
+  // GET CONTAINER OBJECT
+  let container = docker.getContainer(id);
 
+  // START CONTAINER
   container.start(function(err, result) {
     if (err) {
       res.send(err);
@@ -61,11 +74,16 @@ var start_container = function(req, res) {
   });
 };
 
-//////////////// STOP CONTAINER ////////////////
+///////////////////////////////////////////////////////////////////////////
+// STOP CONTAINER
+///////////////////////////////////////////////////////////////////////////
 var stop_container = function(req, res) {
+  // GET ID FROM PARAMS
   var id = req.params.id;
+  // GET CONTAINER OBJECT
   var container = docker.getContainer(id);
 
+  // STOP CONTAINER
   container.stop(function(err, result) {
     if (err) {
       res.send(err);
@@ -75,15 +93,21 @@ var stop_container = function(req, res) {
   });
 };
 
-
-//////////////// DELETE CONTAINER ////////////////
+///////////////////////////////////////////////////////////////////////////
+// DELETE CONTAINER
+///////////////////////////////////////////////////////////////////////////
 var delete_container = function(req, res) {
-  var id = req.params.id;
-  var container = docker.getContainer(id);
-  var opts = {
+  // GET ID FROM PARAMS
+  let id = req.params.id;
+  // GET CONTAINER OBJECT
+  let container = docker.getContainer(id);
+  
+  // OPTIONS OBJECT
+  let opts = {
     "id": id
   };
 
+  // DELETE CONTAINER
   container.remove(opts, function(err, result) {
     if (err) {
       res.send(err);
@@ -93,16 +117,21 @@ var delete_container = function(req, res) {
   });
 };
 
-//////////////// GET STATS OF CONTAINER ////////////////
+///////////////////////////////////////////////////////////////////////////
+// GET STATS OF CONTAINER
+///////////////////////////////////////////////////////////////////////////
 var get_stats_of_container = function(req, res) {
-  var id = req.params.id;
-  var container = docker.getContainer(id);
-  // console.log("Cont: " + JSON.stringify(container));
+  // GET ID FROM PARAMS
+  let id = req.params.id;
+  // GET CONTAINER OBJECT
+  let container = docker.getContainer(id);
 
+  // OPTIONS OBJECT
   let opts = {
     "stream": false,
   };
 
+  // GET STATS OF CONTAINER ONCE, NOT AS A STREAM
   container.stats(opts, function(err, result) {
     if (err) {
       res.send(err);
@@ -112,11 +141,16 @@ var get_stats_of_container = function(req, res) {
   });
 };
 
-//////////////// GET LOGS OF CONTAINER ////////////////
+///////////////////////////////////////////////////////////////////////////
+// GET LOGS OF CONTAINER
+///////////////////////////////////////////////////////////////////////////
 var get_logs_of_container = function(req, res) {
+  // GET ID FROM PARAMS
   var id = req.params.id;
+  // GET CONTAINER OBJECT
   var container = docker.getContainer(id);
 
+  // OPTIONS OBJECT
   let opts = {
     "follow": false,
     "stdout": true,
@@ -124,6 +158,7 @@ var get_logs_of_container = function(req, res) {
     "tail:": 2
   };
 
+  // GET LOGS OF CONTAINER ONCE, NOT AS A STREAM
   container.logs(opts, function(err, result) {
     if (err) {
       res.send(err);
@@ -133,37 +168,33 @@ var get_logs_of_container = function(req, res) {
   });
 };
 
-//////////////// GET LIST OF CONTAINERS ////////////////
+///////////////////////////////////////////////////////////////////////////
+// GET LIST OF CONTAINERS
+///////////////////////////////////////////////////////////////////////////
 var get_list_of_containers = function(req, res) {
-  // res.json({"success": true});
-  // return new Promise((resolve, reject) => {
-    docker.listContainers({all: true}, function(err, containers) {
-      if (err) {
-        // console.log(JSON.stringify(err));
-        // reject(err);
-        res.send(err);
-      } else {
-        // console.log(JSON.stringify(containers));
-        // resolve(containers);
-        res.json(containers);
-      }
-    });
-  // });
-};
-
-//////////////// GET LIST AVAILABLE IMAGES ////////////////
-var get_list_of_images = function(req, res) {
-  docker.listImages({all: true}, function(err, images) {
+  // GET ALL CONTAINERS
+  docker.listContainers({all: true}, function(err, containers) {
     if (err) {
-      // console.log(JSON.stringify(err));
       res.send(err);
     } else {
-      // console.log(JSON.stringify(images));
-      res.json(images);
+      res.json(containers);
     }
   });
 };
 
+///////////////////////////////////////////////////////////////////////////
+// GET LIST AVAILABLE IMAGES
+///////////////////////////////////////////////////////////////////////////
+var get_list_of_images = function(req, res) {
+  // GET ALL AVAILABLE IMAGES
+  docker.listImages({all: true}, function(err, images) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.json(images);
+    }
+  });
+};
 
 
 ///////////////////////////////////////////////////////////////////////////
