@@ -17,13 +17,24 @@ var pull_docker = function(req, res) {
   // PULL DOCKER IMAGE
   docker.pull(repo_name, function (err, stream) {
     if (err) { // IF ERROR SEND ERR
-      res.send(err);
+      console.log('error at pull: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
     } else { // FOLLOW PROGRESS AND LOG
       docker.modem.followProgress(stream, onFinished, onProgress);
 
       // ON FINISH RETURN IMAGE
       function onFinished(err, output) {
-        res.send(output);
+        if (err) {
+          console.log('error at pull: ' + JSON.stringify(err));
+          let errMsg = {
+            'status': 'Warning',
+            'message': err
+          }
+          res.json(errMsg);
+        } else {
+          console.log('Success at pull: ' + JSON.stringify(output));
+          res.status(200).json(output);
+        }
       }
 
       function onProgress(event) {
@@ -48,9 +59,11 @@ var create_container = function(req, res) {
   // CREATE CONTAINER FROM IMAGE NAME
   docker.createContainer(opts, function (err, container) {
     if (err) {
-      res.send(err);
+      console.log('container err: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
     } else {
-      res.json(container);
+      console.log('container res: ' + JSON.stringify(container));
+      res.status(200).json(container);
     }
   });
 };
