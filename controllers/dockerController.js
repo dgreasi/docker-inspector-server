@@ -32,7 +32,7 @@ var pull_docker = function(req, res) {
           }
           res.json(errMsg);
         } else {
-          console.log('Success at pull: ' + JSON.stringify(output));
+          // console.log('Success at pull: ' + JSON.stringify(output));
           res.status(200).json(output);
         }
       }
@@ -40,6 +40,26 @@ var pull_docker = function(req, res) {
       function onProgress(event) {
         console.log(JSON.stringify(event));
       }
+    }
+  });
+};
+
+///////////////////////////////////////////////////////////////////////////
+// DELTE DOCKER IMAGE BY NAME
+///////////////////////////////////////////////////////////////////////////
+var delete_docker = function(req, res) {
+  // GET REPO_NAME FROM BODY
+  let repo_name = req.body.repo_name;
+
+  // GET DOCKER IMAGE
+  let image = docker.getImage(repo_name);
+
+  image.remove(function(err, result) {
+    if (err) {
+      console.log('error at delete_docker: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
+    } else {
+      res.status(200).json(result);
     }
   });
 };
@@ -59,10 +79,10 @@ var create_container = function(req, res) {
   // CREATE CONTAINER FROM IMAGE NAME
   docker.createContainer(opts, function (err, container) {
     if (err) {
-      console.log('container err: ' + JSON.stringify(err));
+      console.log('err createContainer: ' + JSON.stringify(err));
       res.status(err.statusCode).json(err);
     } else {
-      console.log('container res: ' + JSON.stringify(container));
+      // console.log('res createContainer: ' + JSON.stringify(container));
       res.status(200).json(container);
     }
   });
@@ -80,9 +100,11 @@ var start_container = function(req, res) {
   // START CONTAINER
   container.start(function(err, result) {
     if (err) {
-      res.send(err);
+      console.log('err start_container: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
     } else {
-      res.json(result);
+      // console.log('res start_container: ' + JSON.stringify(result));
+      res.status(200).json(result);
     }
   });
 };
@@ -99,9 +121,11 @@ var stop_container = function(req, res) {
   // STOP CONTAINER
   container.stop(function(err, result) {
     if (err) {
-      res.send(err);
+      console.log('err stop_container: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
     } else {
-      res.json(result);
+      // console.log('res stop_container: ' + JSON.stringify(result));
+      res.status(200).json(result);
     }
   });
 };
@@ -123,9 +147,11 @@ var delete_container = function(req, res) {
   // DELETE CONTAINER
   container.remove(opts, function(err, result) {
     if (err) {
-      res.send(err);
+      console.log('err delete_container: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
     } else {
-      res.json(result);
+      // console.log('res delete_container: ' + JSON.stringify(result));
+      res.status(200).json(result);
     }
   });
 };
@@ -147,9 +173,11 @@ var get_stats_of_container = function(req, res) {
   // GET STATS OF CONTAINER ONCE, NOT AS A STREAM
   container.stats(opts, function(err, result) {
     if (err) {
-      res.send(err);
+      console.log('err get_stats_of_container: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
     } else {
-      res.json(result);
+      // console.log('res get_stats_of_container: ' + JSON.stringify(result));
+      res.status(200).json(result);
     }
   });
 };
@@ -174,9 +202,11 @@ var get_logs_of_container = function(req, res) {
   // GET LOGS OF CONTAINER ONCE, NOT AS A STREAM
   container.logs(opts, function(err, result) {
     if (err) {
-      res.send(err);
+      console.log('err get_logs_of_container: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
     } else {
-      res.json(result);
+      // console.log('res get_logs_of_container: ' + JSON.stringify(result));
+      res.status(200).json(result);
     }
   });
 };
@@ -188,9 +218,11 @@ var get_list_of_containers = function(req, res) {
   // GET ALL CONTAINERS
   docker.listContainers({all: true}, function(err, containers) {
     if (err) {
-      res.send(err);
+      console.log('err listContainers: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
     } else {
-      res.json(containers);
+      // console.log('res listContainers ' + JSON.stringify(containers));
+      res.status(200).json(containers);
     }
   });
 };
@@ -202,9 +234,11 @@ var get_list_of_images = function(req, res) {
   // GET ALL AVAILABLE IMAGES
   docker.listImages({all: true}, function(err, images) {
     if (err) {
-      res.send(err);
+      console.log('err listImages: ' + JSON.stringify(err));
+      res.status(err.statusCode).json(err);
     } else {
-      res.json(images);
+      // console.log('res listContainers ' + JSON.stringify(images));
+      res.status(200).json(images);
     }
   });
 };
@@ -217,6 +251,7 @@ var get_list_of_images = function(req, res) {
 
 module.exports = {
   pull_docker,
+  delete_docker,
   create_container,
   start_container,
   stop_container,
